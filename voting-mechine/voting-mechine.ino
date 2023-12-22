@@ -149,6 +149,13 @@ void vote() {
   lcd.print("Place your finger");
   fingerprintID = getFingerprintID();
 
+  if(fingerprintID==9){
+      lcd.clear();
+      lcd.setCursor(0, 1);
+      lcd.print("Fingerprint not found");
+      return;
+  }
+
   Serial.println("Fingerprint id : " + fingerprintID);
 
   lcd.clear();
@@ -233,6 +240,7 @@ void result() {
   vote2 = EEPROM.read(EEPROM_VOTE_CAN_2);
   vote3 = EEPROM.read(EEPROM_VOTE_CAN_3);
   lcd.clear();
+
   String line = "result c1-";
   line.concat(vote1);
   line.concat(" c2-");
@@ -249,9 +257,10 @@ void result() {
     line.concat("c1 win");
   else if (vote2 > vote1 && vote2 > vote3)
     line.concat("c2 win");
-  else
+  else if (vote3 > vote1 && vote3 > vote2)
     line.concat("c3 win");
-
+  else
+    line="Draw";
   lcd.clear();
   lcd.print(line);
   delay(3000);
