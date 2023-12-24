@@ -6,7 +6,6 @@ void setup() {
   // put your setup code here, to run once:
   for(int i =0; i<EEPROM.length(); i++){
     Serial.print("deleting");
-    Serial.print(EEPROM.read(i));
     EEPROM.write(i,0);
   }
 }

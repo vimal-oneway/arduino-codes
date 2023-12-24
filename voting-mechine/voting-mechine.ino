@@ -145,9 +145,11 @@ void loop() {
 
   if (digitalRead(VOTE) == 0) {
     vote();  // 7 pin
-  } else if (digitalRead(RESULT) == 0) {
+  } 
+  else if (digitalRead(RESULT) == 0) {
     result();  // 5 pin
-  } else if (digitalRead(ENROLL) == 0) {
+  }
+   else if (digitalRead(ENROLL) == 0) {
     enroll();  // 6 pin
   }
 
@@ -561,8 +563,6 @@ uint8_t getFingerprintEnroll() {
   return true;
 }
 
-
-
 uint8_t getFingerprintID() {
   Serial.println("getFingerprintID openning ");
   int p = -1;
@@ -635,16 +635,6 @@ uint8_t getFingerprintID() {
   return finger.fingerID;
 }
 
-
-
-
-
-
-
-
-
-
-
 void deleteAllMemory() {
 
   lcd.clear();
@@ -694,88 +684,7 @@ uint8_t deleteFingerprint(uint8_t id) {
 }
 
 
-
-// void result() {
-//   // vote1 = EEPROM.read(EEPROM_VOTE_CAN_1);
-//   // vote2 = EEPROM.read(EEPROM_VOTE_CAN_2);
-//   // vote3 = EEPROM.read(EEPROM_VOTE_CAN_3);
-
-//   // lcd.clear();
-//   // lcd.print("Result");
-//   // delay(1000);
-
-//   // Serial.println(vote1);
-//   // Serial.println(vote2);
-//   // Serial.println(vote3);
-//   // String line = "result c1-";
-//   // line.concat(vote1);
-//   // line.concat(" c2-");
-//   // line.concat(vote2);
-//   // lcd.print(line);
-//   // line = "c3-";
-//   // line.concat(vote3);
-//   // lcd.setCursor(0, 1);
-//   // lcd.print(line);
-//   // delay(3000);
-//   // String resultLine = getResult(vote1, vote2, vote3);
-//   // line.concat(resultLine);
-
-//   // Serial.println(resultLine);
-//   // Serial.println(line);
-//   // lcd.clear();
-//   // lcd.print(resultLine);
-//   Serial.print("begin");
-
-//   vote1 = EEPROM.read(EEPROM_VOTE_CAN_1);
-//   vote2 = EEPROM.read(EEPROM_VOTE_CAN_2);
-//   vote3 = EEPROM.read(EEPROM_VOTE_CAN_3);
-
-//   // lcd.clear();
-//   // String line = "result c1-";
-//   // line.concat(vote1);
-//   // line.concat(" c2-");
-//   // line.concat(vote2);
-//   // lcd.print(line);
-//   // line = "c3-";
-//   // line.concat(vote3);
-//   // lcd.setCursor(0, 1);
-//   // lcd.print(line);
-//   // delay(3000);
-
-//   int totalVote = vote1 + vote2 + vote3;
-
-
-//   if (totalVote != 0) {
-//     Serial.println("in if");
-
-//       lcd.clear();
-//     if (vote1 > vote2 && vote1 > vote3) {
-//       lcd.print("c1 win");
-//       Serial.println("in c1");
-//     } else if (vote2 > vote1 && vote2 > vote3) {
-//       Serial.println("in c2");
-//       lcd.print("c2 win");
-//     } else if (vote3 > vote1 && vote3 > vote2) {
-//       Serial.println("in c3");
-//       lcd.print("c3 win");
-//     } else {
-//       Serial.println("in tied");
-//       lcd.print("vote tied");
-//     }
-//   } else {
-//     Serial.println("in else");
-//     lcd.print("No vote populated");
-//   }
-//       delay(3000);
-
-//   // Serial.print(line);
-
-//   lcd.clear();
-//   // lcd.print(line);
-//   Serial.println("ended");
-// }
-
-
+ 
 
 void result() {
   vote1 = EEPROM.read(EEPROM_VOTE_CAN_1);
@@ -783,7 +692,7 @@ void result() {
   vote3 = EEPROM.read(EEPROM_VOTE_CAN_3);
   lcd.clear();
 
-  digitalWrite(LEDRESULT,HIGH);
+  digitalWrite(LEDRESULT, HIGH);
 
   lcd.print("result c1-");
   lcd.print(vote1);
@@ -795,29 +704,30 @@ void result() {
   lcd.print(vote3); 
   delay(3000);
  
-
-  int totalVote = vote1 + vote2 + vote3;
-
-  if (totalVote != 0) {
-    Serial.println("in if");
-
     lcd.clear();
+
+  // int totalVote = vote1 + vote2 + vote3;
+
+  if (vote1 == 0 && vote2 == 0 && vote3 == 0) {
+    // Serial.println("in else");
+    lcd.print("No vote populated");
+   
+  } else {
+    //  Serial.println("in if");
+
     if (vote1 > vote2 && vote1 > vote3) {
       lcd.print("c1 win");
-      Serial.println("in c1");
+      // Serial.println("in c1");
     } else if (vote2 > vote1 && vote2 > vote3) {
-      Serial.println("in c2");
+      // Serial.println("in c2");
       lcd.print("c2 win");
     } else if (vote3 > vote1 && vote3 > vote2) {
-      Serial.println("in c3");
+      // Serial.println("in c3");
       lcd.print("c3 win");
     } else {
-      Serial.println("in tied");
+      // Serial.println("in tied");
       lcd.print("vote tied");
     }
-  } else {
-    Serial.println("in else");
-    lcd.print("No vote populated");
   }
 
   delay(3000);
