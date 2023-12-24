@@ -7,7 +7,7 @@
 #include <EEPROM.h>
 
 #include <LiquidCrystal_I2C.h>
-LiquidCrystal_I2C lcd(0x27, 20, 4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
+LiquidCrystal_I2C lcd(0x27, 16, 4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 
 #include <Adafruit_Fingerprint.h>
 #include <SoftwareSerial.h>
@@ -15,22 +15,27 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);  // set the LCD address to 0x27 for a 16 cha
 SoftwareSerial mySerial(2, 3);
 
 Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
-int fingerprintID = 0;
+uint8_t fingerprintID = -1;
 
-#define RESULT 5
-#define ENROLL 6
-#define VOTE 7
+#define RESULT 14
+#define ENROLL 15
+#define VOTE 16
+#define DELETEFUNC 17
 
-#define CAN1 8
-#define CAN2 9
-#define CAN3 10
+#define CAN1 13
+#define CAN2 12
+#define CAN3 11
+
+
+#define LEDVOTE 4
+#define LEDRESULT 5
 
 #define EEPROM_VOTE_CAN_1 0
 #define EEPROM_VOTE_CAN_2 1
 #define EEPROM_VOTE_CAN_3 2
 #define EEPROM_ID 3
 #define EEPROM_INDEX 4
- 
+
 int vote1, vote2, vote3, eepromIndex;
 uint8_t id = 1;
 
@@ -48,6 +53,7 @@ void setup() {
   pinMode(VOTE, INPUT);
   pinMode(ENROLL, INPUT);
   pinMode(RESULT, INPUT);
+  pinMode(DELETEFUNC, INPUT);
 
   digitalWrite(VOTE, HIGH);
   digitalWrite(ENROLL, HIGH);
@@ -55,6 +61,9 @@ void setup() {
   digitalWrite(CAN1, HIGH);
   digitalWrite(CAN2, HIGH);
   digitalWrite(CAN3, HIGH);
+  digitalWrite(DELETEFUNC, HIGH);
+  digitalWrite(LEDRESULT, LOW);
+  digitalWrite(LEDVOTE, LOW);
 
   if (finger.verifyPassword()) {
     Serial.println("Found fingerprint sensor!");
@@ -141,19 +150,29 @@ void loop() {
   } else if (digitalRead(ENROLL) == 0) {
     enroll();  // 6 pin
   }
+
+  else if (digitalRead(DELETEFUNC) == 0) {
+    deleteAllMemory();
+  }
   delay(500);
 }
 
 void vote() {
   lcd.clear();
-  lcd.print("Place your finger");
+  lcd.print("Place your");
+  lcd.setCursor(0, 1);
+  lcd.print("Finger to vote");
+
   fingerprintID = getFingerprintID();
 
-  if(fingerprintID==9){
-      lcd.clear();
-      lcd.setCursor(0, 1);
-      lcd.print("Fingerprint not found");
-      return;
+  Serial.print(fingerprintID + " was found");
+
+
+  if (fingerprintID == 9) {
+    lcd.clear();
+    lcd.setCursor(0, 1);
+    lcd.print("Fingerprint not found");
+    return;
   }
 
   Serial.println("Fingerprint id : " + fingerprintID);
@@ -200,36 +219,50 @@ void setVote(int id) {
 
   Serial.println(id);
   Serial.println("your index value");
-
+  lcd.clear();
+  lcd.print("Select canidate");
   while (1) {
-    lcd.clear();
-    lcd.print("Select canidate");
     c1 = digitalRead(CAN1);
     c2 = digitalRead(CAN2);
     c3 = digitalRead(CAN3);
     if (c1 == 0) {
+      digitalWrite(LEDVOTE, HIGH);
+
       int c1_vote = EEPROM.read(0);
       vote1 = c1_vote + 1;
       EEPROM.write(0, vote1);
       EEPROM.write(id + 1, 1);
       lcd.clear();
       lcd.print("Voted to CAN 1");
+      digitalWrite(LEDVOTE, LOW);
+
+      delay(2000);
       break;
+
     } else if (c2 == 0) {
+      digitalWrite(LEDVOTE, HIGH);
       int c2_vote = EEPROM.read(1);
       vote2 = c2_vote + 1;
       EEPROM.write(1, vote2);
       EEPROM.write(id + 1, 1);
       lcd.clear();
       lcd.print("Voted to CAN 2");
+
+      digitalWrite(LEDVOTE, LOW);
+      delay(2000);
       break;
     } else if (c3 == 0) {
+      digitalWrite(LEDVOTE, HIGH);
+
       int c3_vote = EEPROM.read(2);
       vote3 = c3_vote + 1;
       EEPROM.write(2, vote3);
       EEPROM.write(id + 1, 1);
       lcd.clear();
       lcd.print("Voted to CAN 3");
+      digitalWrite(LEDVOTE, LOW);
+
+      delay(2000);
       break;
     }
   }
@@ -240,7 +273,12 @@ void result() {
   vote2 = EEPROM.read(EEPROM_VOTE_CAN_2);
   vote3 = EEPROM.read(EEPROM_VOTE_CAN_3);
   lcd.clear();
+  lcd.print("Result");
+  delay(1000);
 
+  Serial.println(vote1);
+  Serial.println(vote2);
+  Serial.println(vote3);
   String line = "result c1-";
   line.concat(vote1);
   line.concat(" c2-");
@@ -251,20 +289,34 @@ void result() {
   lcd.setCursor(0, 1);
   lcd.print(line);
   delay(3000);
+  String resultLine = getResult(vote1, vote2, vote3);
+  line.concat(resultLine);
 
-  line = "";
-  if (vote1 > vote2 && vote1 > vote3)
-    line.concat("c1 win");
-  else if (vote2 > vote1 && vote2 > vote3)
-    line.concat("c2 win");
-  else if (vote3 > vote1 && vote3 > vote2)
-    line.concat("c3 win");
-  else
-    line="Draw";
+  Serial.println(line);
   lcd.clear();
-  lcd.print(line);
+  lcd.print(getResult(vote1, vote2, vote3));
   delay(3000);
 }
+
+
+String getResult(int vote1, int vote2, int vote3) {
+
+  if (vote1 == 0 && vote2 == 0 && vote3 == 0)
+    return "No vote populated";
+
+  if (vote1 > vote2 && vote1 > vote3)
+    return "c1 win";
+  else if (vote2 > vote1 && vote2 > vote3)
+    return "c2 win";
+  else if (vote3 > vote1 && vote3 > vote2)
+    return "c3 win";
+  else if (vote1 == vote2 || vote2 == vote3 || vote3 == vote1)
+    return "vote Tied";
+
+  return "hi";
+}
+
+
 
 void enroll() {
   lcd.clear();
@@ -300,6 +352,8 @@ void enroll() {
   lcd.print(id);
   lcd.setCursor(0, 1);
   lcd.print("enroll success");
+  delay(2000);
+
   lcd.clear();
 }
 
@@ -307,8 +361,12 @@ uint8_t getFingerprintEnroll() {
 
   int p = -1;
   lcd.clear();
-  lcd.print("Waiting for valid finger to enroll as #");
-  lcd.println(id);
+
+  lcd.print("Waiting....");
+  lcd.setCursor(0, 1);
+  lcd.print("for Enroll id:");
+  lcd.print(id);
+
   Serial.print("Waiting for valid finger to enroll as #");
   Serial.println(id);
 
@@ -396,7 +454,9 @@ uint8_t getFingerprintEnroll() {
   Serial.println(id);
   p = -1;
   lcd.clear();
-  lcd.println("Place same finger again");
+  lcd.print("Place same");
+  lcd.setCursor(0, 1);
+  lcd.print("finger again");
   Serial.println("Place same finger again");
   while (p != FINGERPRINT_OK) {
     p = finger.getImage();
@@ -405,6 +465,7 @@ uint8_t getFingerprintEnroll() {
         lcd.clear();
         lcd.println("Image taken");
         Serial.println("Image taken");
+        delay(2000);
         break;
       case FINGERPRINT_NOFINGER:
         // lcd.clear();
@@ -477,6 +538,7 @@ uint8_t getFingerprintEnroll() {
   if (p == FINGERPRINT_OK) {
     lcd.clear();
     lcd.println("Prints matched!");
+    delay(2000);
     Serial.println("Prints matched!");
   } else if (p == FINGERPRINT_PACKETRECIEVEERR) {
     lcd.clear();
@@ -504,6 +566,7 @@ uint8_t getFingerprintEnroll() {
   if (p == FINGERPRINT_OK) {
     lcd.clear();
     lcd.println("Stored!");
+    delay(2000);
     Serial.println("Stored!");
   } else if (p == FINGERPRINT_PACKETRECIEVEERR) {
     lcd.clear();
@@ -602,4 +665,62 @@ uint8_t getFingerprintID() {
   Serial.println(finger.confidence);
 
   return finger.fingerID;
+}
+
+
+
+
+
+
+
+
+
+
+
+void deleteAllMemory() {
+
+  lcd.clear();
+  lcd.print("Deleting...");
+
+  for (int i = 0; i < EEPROM.length(); i++) {
+    Serial.print("deleting");
+    Serial.print(EEPROM.read(i));
+    EEPROM.write(i, 0);
+  }
+
+  Serial.println("Please type in the ID # (from 1 to 127) you want to delete...");
+
+  // delete all
+  int i = 1;
+  while (i <= 255) {
+    deleteFingerprint(i);
+    i++;
+  }
+
+  // Delete particular id
+  // deleteFingerprint(9);
+  lcd.clear();
+  lcd.print("Deleted");
+}
+
+
+uint8_t deleteFingerprint(uint8_t id) {
+  uint8_t p = -1;
+
+  p = finger.deleteModel(id);
+
+  if (p == FINGERPRINT_OK) {
+    Serial.println("Deleted!");
+  } else if (p == FINGERPRINT_PACKETRECIEVEERR) {
+    Serial.println("Communication error");
+  } else if (p == FINGERPRINT_BADLOCATION) {
+    Serial.println("Could not delete in that location");
+  } else if (p == FINGERPRINT_FLASHERR) {
+    Serial.println("Error writing to flash");
+  } else {
+    Serial.print("Unknown error: 0x");
+    Serial.println(p, HEX);
+  }
+
+  return p;
 }
