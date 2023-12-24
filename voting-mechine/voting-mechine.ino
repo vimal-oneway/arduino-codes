@@ -145,11 +145,9 @@ void loop() {
 
   if (digitalRead(VOTE) == 0) {
     vote();  // 7 pin
-  } 
-  else if (digitalRead(RESULT) == 0) {
+  } else if (digitalRead(RESULT) == 0) {
     result();  // 5 pin
-  }
-   else if (digitalRead(ENROLL) == 0) {
+  } else if (digitalRead(ENROLL) == 0) {
     enroll();  // 6 pin
   }
 
@@ -380,31 +378,37 @@ uint8_t getFingerprintEnroll() {
       lcd.clear();
       lcd.println("Image converted");
       Serial.println("Image converted");
+      delay(2000);
       break;
     case FINGERPRINT_IMAGEMESS:
       lcd.clear();
       lcd.println("Image too messy");
       Serial.println("Image too messy");
+      delay(2000);
       return p;
     case FINGERPRINT_PACKETRECIEVEERR:
       lcd.clear();
       lcd.println("Communication error");
       Serial.println("Communication error");
+      delay(2000);
       return p;
     case FINGERPRINT_FEATUREFAIL:
       lcd.clear();
       lcd.println("Could not find fingerprint features");
       Serial.println("Could not find fingerprint features");
+      delay(2000);
       return p;
     case FINGERPRINT_INVALIDIMAGE:
       lcd.clear();
       lcd.println("Could not find fingerprint features");
       Serial.println("Could not find fingerprint features");
+      delay(2000);
       return p;
     default:
       lcd.clear();
       lcd.println("Unknown error");
       Serial.println("Unknown error");
+      delay(2000);
       return p;
   }
 
@@ -446,16 +450,20 @@ uint8_t getFingerprintEnroll() {
         lcd.clear();
         lcd.println("Communication error");
         Serial.println("Communication error");
+        delay(2000);
         break;
       case FINGERPRINT_IMAGEFAIL:
         lcd.clear();
         lcd.println("Imaging error");
         Serial.println("Imaging error");
+        delay(2000);
+
         break;
       default:
         lcd.clear();
         lcd.println("Unknown error");
         Serial.println("Unknown error");
+        delay(2000);
         break;
     }
   }
@@ -684,7 +692,7 @@ uint8_t deleteFingerprint(uint8_t id) {
 }
 
 
- 
+
 
 void result() {
   vote1 = EEPROM.read(EEPROM_VOTE_CAN_1);
@@ -701,17 +709,17 @@ void result() {
   lcd.setCursor(0, 1);
 
   lcd.print("c3-");
-  lcd.print(vote3); 
+  lcd.print(vote3);
   delay(3000);
- 
-    lcd.clear();
+
+  lcd.clear();
 
   // int totalVote = vote1 + vote2 + vote3;
 
   if (vote1 == 0 && vote2 == 0 && vote3 == 0) {
     // Serial.println("in else");
     lcd.print("No vote populated");
-   
+
   } else {
     //  Serial.println("in if");
 
@@ -731,5 +739,5 @@ void result() {
   }
 
   delay(3000);
-  digitalWrite(LEDRESULT,LOW);
+  digitalWrite(LEDRESULT, LOW);
 }
