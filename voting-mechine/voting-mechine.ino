@@ -268,53 +268,21 @@ void setVote(int id) {
   }
 }
 
-void result() {
-  vote1 = EEPROM.read(EEPROM_VOTE_CAN_1);
-  vote2 = EEPROM.read(EEPROM_VOTE_CAN_2);
-  vote3 = EEPROM.read(EEPROM_VOTE_CAN_3);
-  lcd.clear();
-  lcd.print("Result");
-  delay(1000);
 
-  Serial.println(vote1);
-  Serial.println(vote2);
-  Serial.println(vote3);
-  String line = "result c1-";
-  line.concat(vote1);
-  line.concat(" c2-");
-  line.concat(vote2);
-  lcd.print(line);
-  line = "c3-";
-  line.concat(vote3);
-  lcd.setCursor(0, 1);
-  lcd.print(line);
-  delay(3000);
-  String resultLine = getResult(vote1, vote2, vote3);
-  line.concat(resultLine);
+// String getResult(int vote1, int vote2, int vote3) {
 
-  Serial.println(line);
-  lcd.clear();
-  lcd.print(getResult(vote1, vote2, vote3));
-  delay(3000);
-}
+//   if (vote1 == 0 && vote2 == 0 && vote3 == 0)
+//     return "No vote populated";
 
-
-String getResult(int vote1, int vote2, int vote3) {
-
-  if (vote1 == 0 && vote2 == 0 && vote3 == 0)
-    return "No vote populated";
-
-  if (vote1 > vote2 && vote1 > vote3)
-    return "c1 win";
-  else if (vote2 > vote1 && vote2 > vote3)
-    return "c2 win";
-  else if (vote3 > vote1 && vote3 > vote2)
-    return "c3 win";
-  else if (vote1 == vote2 || vote2 == vote3 || vote3 == vote1)
-    return "vote Tied";
-
-  return "hi";
-}
+//   if (vote1 > vote2 && vote1 > vote3)
+//     return "c1 win";
+//   else if (vote2 > vote1 && vote2 > vote3)
+//     return "c2 win";
+//   else if (vote3 > vote1 && vote3 > vote2)
+//     return "c3 win";
+//   else if (vote1 == vote2 || vote2 == vote3 || vote3 == vote1)
+//     return "vote Tied";
+// }
 
 
 
@@ -723,4 +691,135 @@ uint8_t deleteFingerprint(uint8_t id) {
   }
 
   return p;
+}
+
+
+
+// void result() {
+//   // vote1 = EEPROM.read(EEPROM_VOTE_CAN_1);
+//   // vote2 = EEPROM.read(EEPROM_VOTE_CAN_2);
+//   // vote3 = EEPROM.read(EEPROM_VOTE_CAN_3);
+
+//   // lcd.clear();
+//   // lcd.print("Result");
+//   // delay(1000);
+
+//   // Serial.println(vote1);
+//   // Serial.println(vote2);
+//   // Serial.println(vote3);
+//   // String line = "result c1-";
+//   // line.concat(vote1);
+//   // line.concat(" c2-");
+//   // line.concat(vote2);
+//   // lcd.print(line);
+//   // line = "c3-";
+//   // line.concat(vote3);
+//   // lcd.setCursor(0, 1);
+//   // lcd.print(line);
+//   // delay(3000);
+//   // String resultLine = getResult(vote1, vote2, vote3);
+//   // line.concat(resultLine);
+
+//   // Serial.println(resultLine);
+//   // Serial.println(line);
+//   // lcd.clear();
+//   // lcd.print(resultLine);
+//   Serial.print("begin");
+
+//   vote1 = EEPROM.read(EEPROM_VOTE_CAN_1);
+//   vote2 = EEPROM.read(EEPROM_VOTE_CAN_2);
+//   vote3 = EEPROM.read(EEPROM_VOTE_CAN_3);
+
+//   // lcd.clear();
+//   // String line = "result c1-";
+//   // line.concat(vote1);
+//   // line.concat(" c2-");
+//   // line.concat(vote2);
+//   // lcd.print(line);
+//   // line = "c3-";
+//   // line.concat(vote3);
+//   // lcd.setCursor(0, 1);
+//   // lcd.print(line);
+//   // delay(3000);
+
+//   int totalVote = vote1 + vote2 + vote3;
+
+
+//   if (totalVote != 0) {
+//     Serial.println("in if");
+
+//       lcd.clear();
+//     if (vote1 > vote2 && vote1 > vote3) {
+//       lcd.print("c1 win");
+//       Serial.println("in c1");
+//     } else if (vote2 > vote1 && vote2 > vote3) {
+//       Serial.println("in c2");
+//       lcd.print("c2 win");
+//     } else if (vote3 > vote1 && vote3 > vote2) {
+//       Serial.println("in c3");
+//       lcd.print("c3 win");
+//     } else {
+//       Serial.println("in tied");
+//       lcd.print("vote tied");
+//     }
+//   } else {
+//     Serial.println("in else");
+//     lcd.print("No vote populated");
+//   }
+//       delay(3000);
+
+//   // Serial.print(line);
+
+//   lcd.clear();
+//   // lcd.print(line);
+//   Serial.println("ended");
+// }
+
+
+
+void result() {
+  vote1 = EEPROM.read(EEPROM_VOTE_CAN_1);
+  vote2 = EEPROM.read(EEPROM_VOTE_CAN_2);
+  vote3 = EEPROM.read(EEPROM_VOTE_CAN_3);
+  lcd.clear();
+
+  digitalWrite(LEDRESULT,HIGH);
+
+  lcd.print("result c1-");
+  lcd.print(vote1);
+  lcd.print(" c2-");
+  lcd.print(vote2);
+  lcd.setCursor(0, 1);
+
+  lcd.print("c3-");
+  lcd.print(vote3); 
+  delay(3000);
+ 
+
+  int totalVote = vote1 + vote2 + vote3;
+
+  if (totalVote != 0) {
+    Serial.println("in if");
+
+    lcd.clear();
+    if (vote1 > vote2 && vote1 > vote3) {
+      lcd.print("c1 win");
+      Serial.println("in c1");
+    } else if (vote2 > vote1 && vote2 > vote3) {
+      Serial.println("in c2");
+      lcd.print("c2 win");
+    } else if (vote3 > vote1 && vote3 > vote2) {
+      Serial.println("in c3");
+      lcd.print("c3 win");
+    } else {
+      Serial.println("in tied");
+      lcd.print("vote tied");
+    }
+  } else {
+    Serial.println("in else");
+    lcd.print("No vote populated");
+  }
+
+  delay(3000);
+  digitalWrite(LEDRESULT,LOW);
 }
