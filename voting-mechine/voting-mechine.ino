@@ -832,31 +832,75 @@ uint8_t deleteFingerprint(uint8_t id) {
 // Serial.print("\n Winner is ");
 // Serial.print(winner);
 void result() {
-
-
-
-  vote1 = EEPROM.read(CAN1INDEX);
+vote1 = EEPROM.read(CAN1INDEX);
   vote2 = EEPROM.read(CAN2INDEX);
   vote3 = EEPROM.read(CAN3INDEX);
-  vote4 = EEPROM.read(CAN4INDEX);
-  vote5 = EEPROM.read(CAN5INDEX);
-  vote6 = EEPROM.read(CAN6INDEX);
-  vote7 = EEPROM.read(CAN7INDEX);
-  vote8 = EEPROM.read(CAN8INDEX);
-  
-  
+  lcd.clear();
 
   digitalWrite(LEDRESULT, HIGH);
 
-  // lcd.clear();
-  // lcd.print("result c1-");
-  // lcd.print(vote1);
-  // lcd.print(" c2-");
-  // lcd.print(vote2);
-  // lcd.clear();
+  lcd.print("result c1-");
+  lcd.print(vote1);
+  lcd.print(" c2-");
+  lcd.print(vote2);
+  lcd.setCursor(0, 1);
 
+  lcd.print("c3-");
+  lcd.print(vote3);
+  delay(3000);
+
+  lcd.clear();
+
+  // int totalVote = vote1 + vote2 + vote3;
+
+  if (vote1 == 0 && vote2 == 0 && vote3 == 0) {
+    // Serial.println("in else");
+    lcd.print("No vote populated");
+
+  } else {
+    //  Serial.println("in if");
+
+    if (vote1 > vote2 && vote1 > vote3) {
+      lcd.print("c1 win");
+      // Serial.println("in c1");
+    } else if (vote2 > vote1 && vote2 > vote3) {
+      // Serial.println("in c2");
+      lcd.print("c2 win");
+    } else if (vote3 > vote1 && vote3 > vote2) {
+      // Serial.println("in c3");
+      lcd.print("c3 win");
+    } else {
+      // Serial.println("in tied");
+      lcd.print("vote tied");
+    }
+  }
 
   delay(3000);
+  digitalWrite(LEDRESULT, LOW);
+
+
+  // vote1 = EEPROM.read(CAN1INDEX);
+  // vote2 = EEPROM.read(CAN2INDEX);
+  // vote3 = EEPROM.read(CAN3INDEX);
+  // vote4 = EEPROM.read(CAN4INDEX);
+  // vote5 = EEPROM.read(CAN5INDEX);
+  // vote6 = EEPROM.read(CAN6INDEX);
+  // vote7 = EEPROM.read(CAN7INDEX);
+  // vote8 = EEPROM.read(CAN8INDEX);
+  
+  
+
+  // digitalWrite(LEDRESULT, HIGH);
+
+  // // lcd.clear();
+  // // lcd.print("result c1-");
+  // // lcd.print(vote1);
+  // // lcd.print(" c2-");
+  // // lcd.print(vote2);
+  // // lcd.clear();
+
+
+  // delay(3000);
   // lcd.setCursor(0, 1);
   // lcd.print("c3-");
   // lcd.print(vote3);
