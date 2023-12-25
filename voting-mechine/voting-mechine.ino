@@ -44,14 +44,18 @@ uint8_t fingerprintID = -1;
 #define LEDVOTE 4
 #define LEDRESULT 5
 
-#define EEPROM_VOTE_CAN_1 0
-#define EEPROM_VOTE_CAN_2 1
-#define EEPROM_VOTE_CAN_3 2
 #define EEPROM_ID 8
 #define EEPROM_INDEX 9
-
-int id;
-
+int vote1;
+int vote2;
+int vote3;
+int vote4;
+int vote5;
+int vote6;
+int vote7;
+int vote8;
+uint8_t id = 1;
+// int votes[7];
 
 void setup() {
   //Fingerprint sensor module setup
@@ -180,6 +184,7 @@ void vote() {
   lcd.print("Place your");
   lcd.setCursor(0, 1);
   lcd.print("Finger to vote");
+  delay(2000);
 
   fingerprintID = getFingerprintID();
 
@@ -416,16 +421,20 @@ uint8_t getFingerprintEnroll() {
         lcd.clear();
 
         lcd.println("Communication error");
+        delay(2000);
         Serial.println("Communication error");
         break;
       case FINGERPRINT_IMAGEFAIL:
         lcd.clear();
         lcd.println("Imaging error");
+        delay(2000);
+
         Serial.println("Imaging error");
         break;
       default:
         lcd.clear();
         lcd.println("Unknown error");
+        delay(2000);
         Serial.println("Unknown error");
         break;
     }
@@ -536,32 +545,38 @@ uint8_t getFingerprintEnroll() {
     case FINGERPRINT_OK:
       lcd.clear();
       lcd.println("Image converted");
+      delay(2000);
       Serial.println("Image converted");
       break;
     case FINGERPRINT_IMAGEMESS:
       lcd.clear();
       lcd.println("Image too messy");
+      delay(2000);
       Serial.println("Image too messy");
       return p;
     case FINGERPRINT_PACKETRECIEVEERR:
       lcd.clear();
       lcd.println("Communication error");
+      delay(2000);
       Serial.println("Communication error");
       return p;
     case FINGERPRINT_FEATUREFAIL:
       lcd.clear();
       lcd.println("Could not find fingerprint features");
+      delay(2000);
       Serial.println("Could not find fingerprint features");
       return p;
     case FINGERPRINT_INVALIDIMAGE:
       lcd.clear();
       lcd.println("Could not find fingerprint features");
+      delay(2000);
       Serial.println("Could not find fingerprint features");
       return p;
     default:
       lcd.clear();
       lcd.println("Unknown error");
       Serial.println("Unknown error");
+      delay(2000);
       return p;
   }
 
@@ -582,16 +597,19 @@ uint8_t getFingerprintEnroll() {
   } else if (p == FINGERPRINT_PACKETRECIEVEERR) {
     lcd.clear();
     lcd.println("Communication error");
+    delay(2000);
     Serial.println("Communication error");
     return p;
   } else if (p == FINGERPRINT_ENROLLMISMATCH) {
     lcd.clear();
     lcd.println("Fingerprints did not match");
+    delay(2000);
     Serial.println("Fingerprints did not match");
     return p;
   } else {
     lcd.clear();
     lcd.println("Unknown error");
+    delay(2000);
     Serial.println("Unknown error");
     return p;
   }
@@ -610,21 +628,25 @@ uint8_t getFingerprintEnroll() {
   } else if (p == FINGERPRINT_PACKETRECIEVEERR) {
     lcd.clear();
     lcd.println("Communication error");
+    delay(2000);
     Serial.println("Communication error");
     return p;
   } else if (p == FINGERPRINT_BADLOCATION) {
     lcd.clear();
     lcd.println("Could not store in that location");
     Serial.println("Could not store in that location");
+    delay(2000);
     return p;
   } else if (p == FINGERPRINT_FLASHERR) {
     lcd.clear();
     lcd.println("Error writing to flash");
+    delay(2000);
     Serial.println("Error writing to flash");
     return p;
   } else {
     lcd.clear();
     lcd.println("Unknown error");
+    delay(2000);
     Serial.println("Unknown error");
     return p;
   }
@@ -753,130 +775,220 @@ uint8_t deleteFingerprint(uint8_t id) {
 }
 
 
+// vote1 = EEPROM.read(EEPROM_VOTE_CAN_1);
+// vote2 = EEPROM.read(EEPROM_VOTE_CAN_2);
+// vote3 = EEPROM.read(EEPROM_VOTE_CAN_3);
+// lcd.clear();
+
+
+
+// digitalWrite(LEDRESULT, HIGH);
+
+// // get value form EEPROM
+// Serial.println(" get eeprom votes ");
+
+// // Calucaling who is winner
+// int maxVote = -1, winner = -1, total = 0, prevMaxVote = -1;
+// // int i = 0;
+// for (int i = 0; i <= 7; i++) {
+//   votes[i] = EEPROM.read(i);
+//   // Serial.println("");
+//   // Serial.print(i);
+//   // Serial.print(" -- ");
+//   // Serial.print(votes[i]);
+
+
+//   // Serial.println("");
+//   // Serial.print("Entering ---");
+
+//   // Serial.println("");
+//   // Serial.print("========");
+//   // Serial.print(i);
+//   // Serial.print(" == ");
+//   // Serial.print(votes[i]);
+//   // Serial.print("========");
+//   total += votes[i];
+//   if ( votes[i] > maxVote && votes[i] != 0 && i < 8) {
+//     maxVote = votes[i];
+//     winner = i;
+//     // Serial.println("");
+//     // Serial.print("========");
+//     // Serial.print("Setting votes");
+//     // Serial.print(votes[i]);
+//     // Serial.print("========");
+//     // Serial.print(i);
+//   }
+//     // prevMaxVote = maxVote;
+// }
+// for (int i = 0; i <= 7; i++) {
+//   if (votes[i] == maxVote && i != winner) {
+//     maxVote = -1;
+//     winner = -1;
+//   }
+// }
+
+
+// Serial.println("");
+// Serial.print("\n Winner is ");
+// Serial.print(winner);
 void result() {
-  // vote1 = EEPROM.read(EEPROM_VOTE_CAN_1);
-  // vote2 = EEPROM.read(EEPROM_VOTE_CAN_2);
-  // vote3 = EEPROM.read(EEPROM_VOTE_CAN_3);
-  lcd.clear();
-
-  int votes[7];
 
 
-  // get value form EEPROM
-  Serial.println(" get eeprom votes ");
 
-  // Calucaling who is winner
-  int maxVote = -1, winner = -1;
-  // int i = 0;
-  for (int i = 0; i <= 7; i++) {
-    votes[i] = EEPROM.read(i);
-    Serial.println("");
-    Serial.print(i);
-    Serial.print(" -- ");
-    Serial.print(votes[i]);
-    
-    // if (maxVote == votes[i] && winner != i) {
-    //   break;
-    // }
-
-    // Serial.println("");
-    // Serial.print("Entering ---");
-
-    // Serial.println("");
-    // Serial.print("========");
-    // Serial.print(i);
-    // Serial.print(" == ");
-    // Serial.print(votes[i]);
-    // Serial.print("========");
-
-    if (votes[i] > maxVote && votes[i] != 0 && i < 8) {
-      maxVote = votes[i];
-      winner = i;
-      Serial.println("");
-      Serial.print("========");
-      Serial.print("Setting votes");
-      Serial.print(votes[i]);
-      Serial.print("========");
-      Serial.print(i);
-    }
-  }
-
-
-  //   while (i<8) {
-  //     if(i==8)
-  // {
-  //   break;
-  // }
-
-
-  // Serial.println("");
-  // Serial.print("Entering ---");
-
-
-  // Serial.println("");
-
-  // Serial.print("========");
-  // Serial.print(i);
-  // Serial.print(" == ");
-  // Serial.print(votes[i]);
-  // Serial.print("========");
-
-  //   if (votes[i] >  maxVote && votes[i] !=0 && i<8) {
-  //     maxVote = votes[i];
-  //     winner = i;
-  // Serial.println("");
-  // Serial.print("========");
-  // Serial.print("Setting votes");
-  // Serial.print(votes[i]);
-  // Serial.print("========");
-  // Serial.print(i);
-
-  //   }
-
-  //   i++;
-
-  // }
-
-  // for (i; i < EEPROM_ID; i++) {
-
-  // }
-
-  Serial.println("");
-
-  Serial.print("\n Winner is ");
-  Serial.print(winner);
-  Serial.print("\n score is ");
-  Serial.print(maxVote);
+  vote1 = EEPROM.read(CAN1INDEX);
+  vote2 = EEPROM.read(CAN2INDEX);
+  vote3 = EEPROM.read(CAN3INDEX);
+  vote4 = EEPROM.read(CAN4INDEX);
+  vote5 = EEPROM.read(CAN5INDEX);
+  vote6 = EEPROM.read(CAN6INDEX);
+  vote7 = EEPROM.read(CAN7INDEX);
+  vote8 = EEPROM.read(CAN8INDEX);
+  
+  
 
   digitalWrite(LEDRESULT, HIGH);
 
+  // lcd.clear();
   // lcd.print("result c1-");
   // lcd.print(vote1);
   // lcd.print(" c2-");
   // lcd.print(vote2);
-  // lcd.setCursor(0, 1);
-
-  // lcd.print("c3-");
-  // lcd.print(vote3);
-  // delay(3000);
-
   // lcd.clear();
 
 
-  // if (vote1 == 0 && vote2 == 0 && vote3 == 0) {
+  delay(3000);
+  // lcd.setCursor(0, 1);
+  // lcd.print("c3-");
+  // lcd.print(vote3);
+  // lcd.print("c4-");
+  // lcd.print(vote4);
+  // lcd.clear();
+  // lcd.print("result c5-");
+  // lcd.print(vote5);
+  // lcd.print(" c6-");
+  // lcd.print(vote6);
+  // lcd.setCursor(0, 1);
+  // lcd.print("c7-");
+  // lcd.print(vote7);
+  // lcd.print("c8-");
+  // lcd.print(vote8);
+  // delay(3000);
+
+
+  // lcd.clear();
+
+  // int totalVote = vote1 + vote2 + vote3;
+
+  // if (vote1 == 0 && vote2 == 0 && vote3 == 0 && vote4 == 0 && vote5 == 0 && vote6 == 0 && vote7 == 0 && vote8 == 0) {
+  //   // Serial.println("in else");
   //   lcd.print("No vote populated");
+
   // } else {
-  //   if (vote1 > vote2 && vote1 > vote3) {
-  //     lcd.print("c1 win");
-  //   } else if (vote2 > vote1 && vote2 > vote3) {
-  //     lcd.print("c2 win");
-  //   } else if (vote3 > vote1 && vote3 > vote2) {
-  //     lcd.print("c3 win");
-  //   } else {
-  //     lcd.print("vote tied");
-  //   }
+  //   //  Serial.println("in if");
+
+    // if (vote1 > vote2 && vote1 > vote3 && vote1 > vote4 && vote1 > vote5 && vote1 > vote6 && vote1 > vote7 && vote1 > vote8) {
+    //   lcd.print("c1 win");
+    //   // Serial.println("in c1");
+    // } else if (vote2 > vote1 && vote2 > vote3 && vote2 > vote4 && vote2 > vote5 && vote2 > vote6 && vote2 > vote7 && vote2 > vote8) {
+    //   // Serial.println("in c2");
+    //   lcd.print("c2 win");
+    // } else if (vote3 > vote1 && vote3 > vote2 && vote3 > vote4 && vote3 > vote5 && vote3 > vote6 && vote3 > vote7 && vote3 > vote8) {
+    //   // Serial.println("in c3");
+    //   lcd.print("c3 win");
+    // }
+    // else if ((vote4 > vote1 && vote4 > vote2 && vote4 > vote3 && vote4 > vote5 && vote4 > vote6 && vote4 > vote7 && vote4 > vote8)) {
+    //   lcd.print("c4 win");
+    // } else if ((vote5 > vote1 && vote5 > vote2 && vote5 > vote3 && vote5 > vote4 && vote5 > vote6 && vote5 > vote7 && vote5 > vote8)) {
+    //   lcd.print("c5 win");
+    // } else if ((vote6 > vote1 && vote6 > vote2 && vote6 > vote3 && vote6 > vote4 && vote6 > vote5 && vote6 > vote7 && vote6 > vote8)) {
+    //   lcd.print("c6 win");
+    // } else if ((vote7 > vote1 && vote7 > vote2 && vote7 > vote3 && vote7 > vote4 && vote7 > vote5 && vote7 > vote6 && vote7 > vote8)) {
+    //   lcd.print("c7 win");
+    // } else if ((vote8 > vote1 && vote8 > vote2 && vote8 > vote3 && vote8 > vote4 && vote8 > vote5 && vote8 > vote6 && vote8 > vote7)) {
+    //   lcd.print("c8 win");
+    // } else {
+    //   // Serial.println("in tied");
+    //   lcd.print("vote tied");
+    // }
   // }
 
-  delay(3000);
-  digitalWrite(LEDRESULT, LOW);
+  // delay(3000);
+  // digitalWrite(LEDRESULT, LOW);
 }
+// //   while (i<8) {
+// //     if(i==8)
+// // {
+// //   break;
+// // }
+
+
+// // Serial.println("");
+// // Serial.print("Entering ---");
+
+
+// // Serial.println("");
+
+// // Serial.print("========");
+// // Serial.print(i);
+// // Serial.print(" == ");
+// // Serial.print(votes[i]);
+// // Serial.print("========");
+
+// //   if (votes[i] >  maxVote && votes[i] !=0 && i<8) {
+// //     maxVote = votes[i];
+// //     winner = i;
+// // Serial.println("");
+// // Serial.print("========");
+// // Serial.print("Setting votes");
+// // Serial.print(votes[i]);
+// // Serial.print("========");
+// // Serial.print(i);
+
+// //   }
+
+// //   i++;
+
+// // }
+
+// // for (i; i < EEPROM_ID; i++) {
+
+// // }
+
+// // Serial.println("");
+
+// // Serial.print("\n Winner is ");
+// // Serial.print(winner);
+// // Serial.print("\n score is ");
+// // Serial.print(maxVote);
+
+
+// // lcd.print("result c1-");
+// // lcd.print(vote1);
+// // lcd.print(" c2-");
+// // lcd.print(vote2);
+// // lcd.setCursor(0, 1);
+
+// // lcd.print("c3-");
+// // lcd.print(vote3);
+// // delay(3000);
+
+// // lcd.clear();
+
+
+// // if (vote1 == 0 && vote2 == 0 && vote3 == 0) {
+// //   lcd.print("No vote populated");
+// // } else {
+// //   if (vote1 > vote2 && vote1 > vote3) {
+// //     lcd.print("c1 win");
+// //   } else if (vote2 > vote1 && vote2 > vote3) {
+// //     lcd.print("c2 win");
+// //   } else if (vote3 > vote1 && vote3 > vote2) {
+// //     lcd.print("c3 win");
+// //   } else {
+// //     lcd.print("vote tied");
+// //   }
+// // }
+
+// delay(3000);
+// digitalWrite(LEDRESULT, LOW);
+// }
