@@ -6,10 +6,10 @@ void setup() {
   {
     // if(EEPROM.read(i))
     // Serial.println(i);
-    Serial.println(" value =  ");
+    Serial.println(" value =");
     Serial.print(EEPROM.read(i));
-    Serial.println(" ");
-
+    Serial.print(" -- ");
+    Serial.print(i);
   }  
   // put your setup code here, to run once:
 

@@ -25,6 +25,20 @@ uint8_t fingerprintID = -1;
 #define CAN1 13
 #define CAN2 12
 #define CAN3 11
+#define CAN4 10
+#define CAN5 9
+#define CAN6 8
+#define CAN7 7
+#define CAN8 6
+
+#define CAN1INDEX 0
+#define CAN2INDEX 1
+#define CAN3INDEX 2
+#define CAN4INDEX 3
+#define CAN5INDEX 4
+#define CAN6INDEX 5
+#define CAN7INDEX 6
+#define CAN8INDEX 7
 
 
 #define LEDVOTE 4
@@ -33,11 +47,11 @@ uint8_t fingerprintID = -1;
 #define EEPROM_VOTE_CAN_1 0
 #define EEPROM_VOTE_CAN_2 1
 #define EEPROM_VOTE_CAN_3 2
-#define EEPROM_ID 3
-#define EEPROM_INDEX 4
+#define EEPROM_ID 8
+#define EEPROM_INDEX 9
 
-int vote1, vote2, vote3, eepromIndex;
-uint8_t id = 1;
+int id;
+
 
 void setup() {
   //Fingerprint sensor module setup
@@ -50,10 +64,19 @@ void setup() {
   pinMode(CAN1, INPUT);
   pinMode(CAN2, INPUT);
   pinMode(CAN3, INPUT);
+  pinMode(CAN4, INPUT);
+  pinMode(CAN5, INPUT);
+  pinMode(CAN6, INPUT);
+  pinMode(CAN7, INPUT);
+  pinMode(CAN8, INPUT);
+
   pinMode(VOTE, INPUT);
   pinMode(ENROLL, INPUT);
   pinMode(RESULT, INPUT);
+
   pinMode(DELETEFUNC, INPUT);
+  pinMode(LEDRESULT, OUTPUT);
+  pinMode(LEDVOTE, OUTPUT);
 
   digitalWrite(VOTE, HIGH);
   digitalWrite(ENROLL, HIGH);
@@ -61,6 +84,11 @@ void setup() {
   digitalWrite(CAN1, HIGH);
   digitalWrite(CAN2, HIGH);
   digitalWrite(CAN3, HIGH);
+  digitalWrite(CAN4, HIGH);
+  digitalWrite(CAN5, HIGH);
+  digitalWrite(CAN6, HIGH);
+  digitalWrite(CAN7, HIGH);
+  digitalWrite(CAN8, HIGH);
   digitalWrite(DELETEFUNC, HIGH);
   digitalWrite(LEDRESULT, LOW);
   digitalWrite(LEDVOTE, LOW);
@@ -73,20 +101,12 @@ void setup() {
     lcd.print("Ready to vote");
   } else {
     Serial.println("Did not find fingerprint sensor :(");
-
     lcd.clear();
     lcd.print("module not Found");
     lcd.setCursor(0, 1);
     lcd.print("Check Connections");
-
     while (1) { delay(1); }
   }
-
-  vote1 = EEPROM.read(EEPROM_VOTE_CAN_1);
-  vote2 = EEPROM.read(EEPROM_VOTE_CAN_2);
-  vote3 = EEPROM.read(EEPROM_VOTE_CAN_3);
-  eepromIndex = EEPROM.read(EEPROM_INDEX);
-
 
   lcd.clear();
   lcd.print("Electronic");
@@ -94,12 +114,12 @@ void setup() {
   lcd.print("Voting Machine");
   delay(1000);
 
-  if (!EEPROM.read(3)) {
+  if (!EEPROM.read(EEPROM_ID)) {
     EEPROM.write(EEPROM_ID, 1);
   }
 
-  if (!EEPROM.read(4)) {
-    EEPROM.write(EEPROM_INDEX, 4);
+  if (!EEPROM.read(EEPROM_INDEX)) {
+    EEPROM.write(EEPROM_INDEX, EEPROM_INDEX);
   }
 
   finger.getParameters();
@@ -118,7 +138,7 @@ int getIndex() {
 }
 
 int getIdIndex(int id) {
-  for (int i = 5; i <= EEPROM.length(); i++) {
+  for (int i = EEPROM_INDEX + 1; i <= EEPROM.length(); i++) {
     Serial.print(EEPROM.read(i));
     Serial.print(" -- ");
     Serial.print(i);
@@ -149,9 +169,7 @@ void loop() {
     result();  // 5 pin
   } else if (digitalRead(ENROLL) == 0) {
     enroll();  // 6 pin
-  }
-
-  else if (digitalRead(DELETEFUNC) == 0) {
+  } else if (digitalRead(DELETEFUNC) == 0) {
     deleteAllMemory();
   }
   delay(500);
@@ -216,6 +234,11 @@ void setVote(int id) {
   int c1 = 0;
   int c2 = 0;
   int c3 = 0;
+  int c4 = 0;
+  int c5 = 0;
+  int c6 = 0;
+  int c7 = 0;
+  int c8 = 0;
 
   Serial.println(id);
   Serial.println("your index value");
@@ -225,43 +248,81 @@ void setVote(int id) {
     c1 = digitalRead(CAN1);
     c2 = digitalRead(CAN2);
     c3 = digitalRead(CAN3);
+    c4 = digitalRead(CAN4);
+    c5 = digitalRead(CAN5);
+    c6 = digitalRead(CAN6);
+    c7 = digitalRead(CAN7);
+    c8 = digitalRead(CAN8);
     if (c1 == 0) {
       digitalWrite(LEDVOTE, HIGH);
-
-      int c1_vote = EEPROM.read(0);
-      vote1 = c1_vote + 1;
-      EEPROM.write(0, vote1);
+      EEPROM.write(CAN1INDEX, EEPROM.read(CAN1INDEX) + 1);
       EEPROM.write(id + 1, 1);
       lcd.clear();
       lcd.print("Voted to CAN 1");
       digitalWrite(LEDVOTE, LOW);
-
       delay(2000);
       break;
-
     } else if (c2 == 0) {
       digitalWrite(LEDVOTE, HIGH);
-      int c2_vote = EEPROM.read(1);
-      vote2 = c2_vote + 1;
-      EEPROM.write(1, vote2);
+      EEPROM.write(CAN2INDEX, EEPROM.read(CAN2INDEX) + 1);
       EEPROM.write(id + 1, 1);
       lcd.clear();
       lcd.print("Voted to CAN 2");
-
       digitalWrite(LEDVOTE, LOW);
       delay(2000);
       break;
     } else if (c3 == 0) {
       digitalWrite(LEDVOTE, HIGH);
-
-      int c3_vote = EEPROM.read(2);
-      vote3 = c3_vote + 1;
-      EEPROM.write(2, vote3);
+      EEPROM.write(CAN3INDEX, EEPROM.read(CAN3INDEX) + 1);
       EEPROM.write(id + 1, 1);
       lcd.clear();
       lcd.print("Voted to CAN 3");
       digitalWrite(LEDVOTE, LOW);
-
+      delay(2000);
+      break;
+    } else if (c4 == 0) {
+      digitalWrite(LEDVOTE, HIGH);
+      EEPROM.write(CAN4INDEX, EEPROM.read(CAN4INDEX) + 1);
+      EEPROM.write(id + 1, 1);
+      lcd.clear();
+      lcd.print("Voted to CAN 4");
+      digitalWrite(LEDVOTE, LOW);
+      delay(2000);
+      break;
+    } else if (c5 == 0) {
+      digitalWrite(LEDVOTE, HIGH);
+      EEPROM.write(CAN5INDEX, EEPROM.read(CAN5INDEX) + 1);
+      EEPROM.write(id + 1, 1);
+      lcd.clear();
+      lcd.print("Voted to CAN 5");
+      digitalWrite(LEDVOTE, LOW);
+      delay(2000);
+      break;
+    } else if (c6 == 0) {
+      digitalWrite(LEDVOTE, HIGH);
+      EEPROM.write(CAN6INDEX, EEPROM.read(CAN6INDEX) + 1);
+      EEPROM.write(id + 1, 1);
+      lcd.clear();
+      lcd.print("Voted to CAN 6");
+      digitalWrite(LEDVOTE, LOW);
+      delay(2000);
+      break;
+    } else if (c7 == 0) {
+      digitalWrite(LEDVOTE, HIGH);
+      EEPROM.write(CAN7INDEX, EEPROM.read(CAN7INDEX) + 1);
+      EEPROM.write(id + 1, 1);
+      lcd.clear();
+      lcd.print("Voted to CAN 7");
+      digitalWrite(LEDVOTE, LOW);
+      delay(2000);
+      break;
+    } else if (c8 == 0) {
+      digitalWrite(LEDVOTE, HIGH);
+      EEPROM.write(CAN8INDEX, EEPROM.read(CAN8INDEX) + 1);
+      EEPROM.write(id + 1, 1);
+      lcd.clear();
+      lcd.print("Voted to CAN 8");
+      digitalWrite(LEDVOTE, LOW);
       delay(2000);
       break;
     }
@@ -269,7 +330,7 @@ void setVote(int id) {
 }
 
 
-// String getResult(int vote1, int vote2, int vote3) {
+// String getResult(int vote1, int vote2, int vote8) {
 
 //   if (vote1 == 0 && vote2 == 0 && vote3 == 0)
 //     return "No vote populated";
@@ -692,51 +753,129 @@ uint8_t deleteFingerprint(uint8_t id) {
 }
 
 
-
-
 void result() {
-  vote1 = EEPROM.read(EEPROM_VOTE_CAN_1);
-  vote2 = EEPROM.read(EEPROM_VOTE_CAN_2);
-  vote3 = EEPROM.read(EEPROM_VOTE_CAN_3);
+  // vote1 = EEPROM.read(EEPROM_VOTE_CAN_1);
+  // vote2 = EEPROM.read(EEPROM_VOTE_CAN_2);
+  // vote3 = EEPROM.read(EEPROM_VOTE_CAN_3);
   lcd.clear();
+
+  int votes[7];
+
+
+  // get value form EEPROM
+  Serial.println(" get eeprom votes ");
+
+  // Calucaling who is winner
+  int maxVote = -1, winner = -1;
+  // int i = 0;
+  for (int i = 0; i <= 7; i++) {
+    votes[i] = EEPROM.read(i);
+    Serial.println("");
+    Serial.print(i);
+    Serial.print(" -- ");
+    Serial.print(votes[i]);
+    
+    // if (maxVote == votes[i] && winner != i) {
+    //   break;
+    // }
+
+    // Serial.println("");
+    // Serial.print("Entering ---");
+
+    // Serial.println("");
+    // Serial.print("========");
+    // Serial.print(i);
+    // Serial.print(" == ");
+    // Serial.print(votes[i]);
+    // Serial.print("========");
+
+    if (votes[i] > maxVote && votes[i] != 0 && i < 8) {
+      maxVote = votes[i];
+      winner = i;
+      Serial.println("");
+      Serial.print("========");
+      Serial.print("Setting votes");
+      Serial.print(votes[i]);
+      Serial.print("========");
+      Serial.print(i);
+    }
+  }
+
+
+  //   while (i<8) {
+  //     if(i==8)
+  // {
+  //   break;
+  // }
+
+
+  // Serial.println("");
+  // Serial.print("Entering ---");
+
+
+  // Serial.println("");
+
+  // Serial.print("========");
+  // Serial.print(i);
+  // Serial.print(" == ");
+  // Serial.print(votes[i]);
+  // Serial.print("========");
+
+  //   if (votes[i] >  maxVote && votes[i] !=0 && i<8) {
+  //     maxVote = votes[i];
+  //     winner = i;
+  // Serial.println("");
+  // Serial.print("========");
+  // Serial.print("Setting votes");
+  // Serial.print(votes[i]);
+  // Serial.print("========");
+  // Serial.print(i);
+
+  //   }
+
+  //   i++;
+
+  // }
+
+  // for (i; i < EEPROM_ID; i++) {
+
+  // }
+
+  Serial.println("");
+
+  Serial.print("\n Winner is ");
+  Serial.print(winner);
+  Serial.print("\n score is ");
+  Serial.print(maxVote);
 
   digitalWrite(LEDRESULT, HIGH);
 
-  lcd.print("result c1-");
-  lcd.print(vote1);
-  lcd.print(" c2-");
-  lcd.print(vote2);
-  lcd.setCursor(0, 1);
+  // lcd.print("result c1-");
+  // lcd.print(vote1);
+  // lcd.print(" c2-");
+  // lcd.print(vote2);
+  // lcd.setCursor(0, 1);
 
-  lcd.print("c3-");
-  lcd.print(vote3);
-  delay(3000);
+  // lcd.print("c3-");
+  // lcd.print(vote3);
+  // delay(3000);
 
-  lcd.clear();
+  // lcd.clear();
 
-  // int totalVote = vote1 + vote2 + vote3;
 
-  if (vote1 == 0 && vote2 == 0 && vote3 == 0) {
-    // Serial.println("in else");
-    lcd.print("No vote populated");
-
-  } else {
-    //  Serial.println("in if");
-
-    if (vote1 > vote2 && vote1 > vote3) {
-      lcd.print("c1 win");
-      // Serial.println("in c1");
-    } else if (vote2 > vote1 && vote2 > vote3) {
-      // Serial.println("in c2");
-      lcd.print("c2 win");
-    } else if (vote3 > vote1 && vote3 > vote2) {
-      // Serial.println("in c3");
-      lcd.print("c3 win");
-    } else {
-      // Serial.println("in tied");
-      lcd.print("vote tied");
-    }
-  }
+  // if (vote1 == 0 && vote2 == 0 && vote3 == 0) {
+  //   lcd.print("No vote populated");
+  // } else {
+  //   if (vote1 > vote2 && vote1 > vote3) {
+  //     lcd.print("c1 win");
+  //   } else if (vote2 > vote1 && vote2 > vote3) {
+  //     lcd.print("c2 win");
+  //   } else if (vote3 > vote1 && vote3 > vote2) {
+  //     lcd.print("c3 win");
+  //   } else {
+  //     lcd.print("vote tied");
+  //   }
+  // }
 
   delay(3000);
   digitalWrite(LEDRESULT, LOW);
